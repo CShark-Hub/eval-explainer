@@ -53,6 +53,7 @@ nav { position: relative; z-index: 2; display: flex; align-items: center; gap: 2
 .nav-spacer { flex: 1; }
 select, .btn { background: transparent; color: var(--text); border: 1.5px solid var(--neutral-700); border-radius: 9999px; padding: .5rem 1rem; font-size: .875rem; font-weight: 500; cursor: pointer; }
 select option { background: var(--neutral-900); }
+#file { max-width: 380px; text-overflow: ellipsis; }
 .btn-mint { background: var(--brand-mint); color: var(--black); border-color: var(--brand-mint); }
 .btn:hover, select:hover { border-color: var(--brand-violet); }
 .btn-mint:hover { background: #66FFC8; }
@@ -168,12 +169,39 @@ footer .small { color: var(--muted); font-size: .875rem; }
 .dz-title { font-size: 1.5rem; font-weight: 500; line-height: 1.3; }
 .dz-sub { color: var(--muted); font-size: .875rem; margin-top: 8px; }
 #dz-list { background: rgba(23,23,23,.7); border: 1px solid var(--line); border-radius: 12px; padding: 16px; font-size: .875rem; max-height: 220px; overflow: auto; }
-.dz-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; }
-.dz-item.cur { background: rgba(162,1,255,.2); }
-.dz-item .n { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
-.dz-item .m { color: var(--muted); white-space: nowrap; }
-.dz-item button, .dz-clear { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .875rem; }
-.dz-item button:hover, .dz-clear:hover { color: var(--red); }
+.dz-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; border: 1px solid transparent; }
+.dz-item.cur { background: rgba(162,1,255,.2); border-color: var(--brand-violet); }
+.dz-item .n { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+.dz-item .n small { display: block; color: var(--muted); font-size: .78rem; }
+.dz-item .m { color: var(--muted); }
+.dz-load { padding: .3rem .9rem; font-size: .8rem; white-space: nowrap; }
+.dz-showing { color: var(--brand-mint); font-size: .8rem; font-weight: 500; white-space: nowrap; padding: 0 .5rem; }
+.dz-rm, .dz-clear { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .875rem; }
+.dz-rm:hover, .dz-clear:hover { color: var(--red); }
+.dz-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+/* explainers: an (i) button opens a popover; docs-backed text links to the exact section */
+.tip { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: 6px; vertical-align: 2px; border-radius: 50%; border: 1.5px solid var(--neutral-600); background: transparent; color: var(--neutral-300); font: italic 700 11px/1 var(--font-serif); cursor: pointer; padding: 0; flex: none; }
+.tip:hover, .tip[aria-expanded="true"] { border-color: var(--brand-mint); color: var(--brand-mint); }
+h2 .tip { width: 22px; height: 22px; font-size: 13px; vertical-align: 8px; }
+#tipbox { position: absolute; z-index: 30; width: min(380px, calc(100vw - 32px)); background: var(--neutral-900); border: 1px solid var(--neutral-700); border-radius: 12px; padding: 16px 18px; font-size: .875rem; line-height: 1.55; color: var(--neutral-300); box-shadow: 0 16px 50px rgba(0,0,0,.7); }
+#tipbox[hidden] { display: none; }
+#tipbox h4 { margin: 0 0 6px; color: var(--text); font-size: 1rem; font-weight: 500; }
+#tipbox p { margin: 0 0 8px; }
+#tipbox code { font-size: .8rem; color: var(--text); }
+#tipbox .src { display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; font-size: .78rem; }
+#tipbox .badge { border-radius: 9999px; padding: 0 .55rem; font-weight: 500; color: var(--black); background: var(--brand-mint); }
+#tipbox .badge.viewer { background: var(--violet-300); }
+.run-flags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+
+/* toast: confirms that a result was loaded, even when the change is below the fold */
+.toast { position: fixed; left: 50%; bottom: 24px; z-index: 20; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  display: flex; align-items: center; gap: 14px; max-width: calc(100vw - 32px); background: var(--neutral-900); border: 1px solid var(--brand-mint); border-radius: 9999px; padding: 10px 10px 10px 20px; font-size: .875rem; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.toast.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast .t { overflow-wrap: anywhere; }
+.toast.bad { border-color: var(--red); }
+@keyframes flash { from { box-shadow: 0 0 0 3px var(--brand-mint); } to { box-shadow: 0 0 0 3px transparent; } }
+.flash .kpis { animation: flash 1.4s ease-out; border-radius: 12px; }
 .dz-bad { color: var(--red); padding: 4px 8px; }
 .dz-head { display: flex; justify-content: space-between; color: var(--neutral-300); margin-bottom: 6px; padding: 0 8px; }
 .dz-folder { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: rgba(23,23,23,.7); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
@@ -219,6 +247,10 @@ footer .small { color: var(--muted); font-size: .875rem; }
       <div class="dz-target" id="dz-target" tabindex="0" role="button">
         <div class="dz-title">Drop <span class="serif">eval results</span> here</div>
         <div class="dz-sub">Result files or whole folders (a plugin, its <code>evals/</code> or <code>evals/results/</code>). Eval output is found inside automatically; each result becomes a source in the dropdown. Files stay in this tab.</div>
+        <div class="dz-actions">
+          <button type="button" class="btn btn-mint" id="dz-files">Choose files…</button>
+          <button type="button" class="btn" id="dz-dir">Choose folder…</button>
+        </div>
       </div>
       <div id="dz-list"></div>
       <form class="dz-folder" id="dz-folder" hidden>
@@ -231,6 +263,8 @@ footer .small { color: var(--muted); font-size: .875rem; }
   </div>
 </div>
 <main class="wrap" id="main"></main>
+<div id="tipbox" role="dialog" aria-modal="false" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span class="t"></span><button class="btn btn-mint" type="button">View results ↓</button></div>
 <footer>
   <div class="blob v"></div>
   <div class="wrap">
@@ -248,36 +282,108 @@ const num = (x, d = 2) => x == null ? '—' : x.toFixed(d);
 const signed = (x, d = 2) => x == null ? '—' : (x >= 0 ? '+' : '') + x.toFixed(d);
 const usd = (x, d = 2) => x == null ? '—' : `$${x.toFixed(d)}`;
 
+// Explainers. `src: 'docs'` text restates https://code.claude.com/docs/en/plugin-evals
+// (anchor in `a`); `src: 'viewer'` marks numbers this page derives itself.
+const DOCS = 'https://code.claude.com/docs/en/plugin-evals';
+const EXPLAIN = {
+  delta: { t: 'Δ, skill − baseline', src: 'docs', a: 'the-no-plugin-baseline',
+    b: `<p>Each case runs twice: the <b>with-arm</b> has the plugin loaded, the <b>without-arm</b> is the same number of runs with no plugin at all. Δ is the with-arm score minus the without-arm score, so it is what the plugin contributed.</p><p>A case that scores 1.0 in both arms passed without the plugin's help. A Δ near 0 while the <code>tool_used: Skill</code> indicator fails usually means Claude is not choosing the skill on that phrasing, so check the skill's <code>description</code>.</p><p>This tile is the mean of the per-run scores in each arm, recomputed from the runs. The CLI's own <code>aggregates.meanDelta</code> is shown in the chips above.</p>` },
+  score: { t: 'Mean score', src: 'docs', a: 'how-a-case-is-scored',
+    b: `<p>A run's score is the fraction of its graders that passed, weighted by each grader's <code>weight</code> (default 1). A case's score is the mean across its runs, three by default. The suite score is the mean of the per-case scores.</p><p>Indicator graders (<code>scored: false</code>) are left out, so both arms share one scale. A run that ended on an API error, or that a mock aborted, scores 0.</p>` },
+  baseline: { t: 'Baseline (without-arm)', src: 'docs', a: 'compare-against-a-no-plugin-baseline',
+    b: `<p>The same prompts and graders, run the same number of times with no plugin loaded. Baseline scores never decide whether a case passes. They exist only to compute Δ.</p><p>Cases that resume a transcript through <code>context.history_file</code> with a path target run the with-arm only, so they have no baseline or Δ.</p>` },
+  runs: { t: 'Runs', src: 'docs', a: 'how-a-case-is-scored',
+    b: `<p>One run of a non-deterministic agent tells you little, so each case runs three times by default (<code>runs:</code> in the case, or <code>--runs N</code>). In a two-arm run every case runs that many times in each arm.</p><p>A single run is noisy. Confirm a change at the default three runs before you trust it.</p>` },
+  cost: { t: 'Total cost', src: 'docs', a: 'json-result',
+    b: `<p><code>costUsd</code> is an estimate at list price of all the model calls, including the judge calls of <code>llm</code> and <code>baseline</code> graders. Each <code>llm</code> grader asks the judge three times per run.</p><p><code>--max-cost-usd</code> sets a hard ceiling. When it is reached, paid graders are skipped and the result is marked <code>partial</code>.</p>` },
+  wall: { t: 'Wall clock', src: 'docs', a: 'json-result',
+    b: `<p><code>durationSeconds</code> is the wall-clock time of the whole suite. <code>-j, --concurrency</code> runs up to 8 agent runs at once. They share one rate limit, and results keep case order.</p>` },
+  threshold: { t: 'Threshold and passing', src: 'docs', a: 'how-a-case-is-scored',
+    b: `<p>A case passes when its with-arm score is at or above <code>--threshold</code>, which defaults to <code>1.0</code>, meaning every scored grader passed in every run. The command exits 1 if any case is below the threshold.</p><p>With <code>--threshold 0</code> every case passes, so read the scores rather than the pass count.</p>` },
+  cli: { t: 'The CLI\'s own aggregates', src: 'docs', a: 'json-result',
+    b: `<p>Taken from the file as written by <code>claude plugin eval</code>: <code>overallScore</code> is the mean case score, <code>casesPassed / casesTotal</code> counts cases at or above the threshold, and <code>meanDelta</code> is the mean Δ across cases in a two-arm run.</p><p>The tiles below are recomputed from the runs. They match these figures unless indicator graders were scored (<code>--ablation none</code>).</p>` },
+  ablationNone: { t: 'Indicators scored under --ablation none', src: 'docs', a: 'compare-against-a-no-plugin-baseline',
+    b: `<p>Under <code>--ablation none</code> nothing is excluded, so the CLI counts the <code>tool_used: Skill</code> indicator in the score. The same suite can therefore produce a different absolute score in the two modes.</p><p>This viewer leaves indicators out in both modes, so runs from either mode compare on one scale. The CLI's own figure is in the chip above.</p>` },
+  partial: { t: 'Partial result', src: 'docs', a: 'json-result',
+    b: `<p><code>partial: true</code> means the suite did not finish. The reason (<code>partialReason</code>) is a cost ceiling, an interruption, or an authentication failure. Leave partial results out of trend charts.</p>` },
+  arm: { t: 'Arm comparison', src: 'viewer', a: 'read-the-results',
+    b: `<p>Each bar is the mean over every run of that arm.</p><ul><li><b>Mean score</b> is the documented run score.</li><li><b>Full pass rate</b> is the share of runs where every scored grader passed, the same as the HTML report's “Perfect runs”.</li><li><b>Deterministic</b> and <b>Judge</b> split the scored graders by type.</li></ul>` },
+  m_score: { t: 'Mean score', src: 'docs', a: 'how-a-case-is-scored', b: `<p>The weighted fraction of scored graders that passed, averaged over every run of the arm.</p>` },
+  m_fullPass: { t: 'Full pass rate', src: 'viewer', a: 'html-report',
+    b: `<p>The share of runs where every scored grader passed, which is a run score of 1.0. The CLI's HTML report calls this “Perfect runs”. Under the default <code>--threshold 1.0</code> a case passes only if all of its runs are perfect.</p>` },
+  m_detPass: { t: 'Deterministic pass rate', src: 'viewer', a: 'grader-types',
+    b: `<p>The share of runs where every scored grader that does <em>not</em> call a judge passed: <code>regex</code>, <code>tool_used</code>, <code>tool_order</code> and <code>file_exists</code>. These checks are free and repeatable, which makes them the stable part of the signal.</p>` },
+  m_judgePass: { t: 'Judge PASS', src: 'docs', a: 'grader-types',
+    b: `<p>The pass rate of <code>llm</code> and <code>baseline</code> graders. An <code>llm</code> grader passes when the judge model votes PASS on the rubric in at least two of three votes. The dots in the case detail are those votes.</p><p>By default the judge is the model Claude Code uses for background tasks. Change it with <code>--judge-model</code>. A small judge can mark a correct answer wrong because of formatting, so if the skill fired but Δ is negative, suspect the judge first.</p>` },
+  m_fired: { t: 'Skill fired (indicator)', src: 'docs', a: 'compare-against-a-no-plugin-baseline',
+    b: `<p>Indicator graders, such as <code>tool_used</code> with <code>tool: Skill</code> or anything marked <code>arm: with-only</code>. A check like “the skill was invoked” can never pass without the plugin, so the CLI reports it in the with-arm as <code>scored: false</code> and leaves it out of both scores.</p><p>Set <code>arm: both</code> on a grader to score it in both arms anyway, for example a “must not invoke the skill” check with <code>min: 0</code> and <code>max: 0</code>.</p>` },
+  m_cost: { t: 'Cost per run', src: 'docs', a: 'json-result', b: `<p><code>costUsd</code> per run, a list-price estimate that includes the judge calls.</p>` },
+  m_time: { t: 'Time per run', src: 'docs', a: 'command-options', b: `<p><code>durationSeconds</code> of one agent run. Each case has a <code>timeout_seconds</code> limit. Some runs that end abnormally, such as on a timeout, are still graded on what they produced.</p>` },
+  m_turns: { t: 'Turns per run', src: 'docs', a: 'command-options', b: `<p>Agent turns used by the run, capped by the case's <code>max_turns</code>. The defaults are 10 turns and 300 seconds. Raise <code>max_turns</code> and <code>timeout_seconds</code> in the case for tasks that need more.</p>` },
+  perCase: { t: 'Per case', src: 'docs', a: 'html-report',
+    b: `<p>Each row is one case. The dots are the mean score of each arm and the number is the case's Δ. Look at negative Δs first: in the CLI's own report those cases get a red edge, because they are regressions.</p><p>Tags (happy, edge, adversarial) come from the <code>tags:</code> line in a case's <code>prompt.md</code> frontmatter or from <code>tags.json</code>. <code>--tag</code> filters runs by them.</p>` },
+  matrix: { t: 'Grader matrix', src: 'docs', a: 'grader-types',
+    b: `<p>The pass rate of each grader per case. The grader types are:</p><ul><li><code>regex</code>: a pattern found, absent (<code>not_contains</code>) or matched N times in the target.</li><li><code>tool_used</code>: the number of matching calls is between <code>min</code> and <code>max</code>.</li><li><code>tool_order</code>: one tool was called before another.</li><li><code>file_exists</code>: a created file matches a glob.</li><li><code>llm</code>: a judge, 2 of 3 votes.</li><li><code>baseline</code>: the run is at least as good as a reference transcript.</li></ul><p>Italic columns are indicators (<code>scored: false</code>). They can show <code>passed: false</code> in a run that scored 1.0, and that is by design.</p>` },
+  detail: { t: 'Case detail', src: 'docs', a: 'json-result',
+    b: `<p>Every run of the case, per arm. A grader chip shows ✓ or ✗ and its weight; hover for the grader's explanation. Dashed chips are indicators. The dots are judge votes, two of three needed.</p><ul><li><b>error:</b> why a run ended abnormally, such as <code>timed out after 300s</code>. Some of these runs are still graded on what they produced. A run that ended on an API error scores 0 without grading.</li><li><b>aborted:</b> a mock stopped the run, which scores 0.</li><li><b>judge skipped:</b> the cost ceiling skipped this run's judge graders, so its score isn't comparable.</li></ul>` },
+};
+
 let TAGS = {};
 const state = { data: null, name: '', armLabels: {}, sel: null, hmArm: 'with' };
 
-// Same rules as scripts/summarize.py: skill-fired is an indicator, never part of
-// the like-for-like score, even when --ablation none marks it scored.
-const scored = run => (run.graders || []).filter(g => g.scored && g.name !== 'skill-fired');
+// Scoring follows https://code.claude.com/docs/en/plugin-evals#how-a-case-is-scored:
+// a run's score is the weighted fraction of its scored graders that passed.
+// Indicator graders (withOnly: `tool_used: Skill`, `arm: with-only`) never count, so both
+// arms share one scale; the CLI already drops them under with-without, and this
+// viewer also drops them under --ablation none, where the CLI scores them.
+const IND = new WeakMap();   // run -> Set of indicator grader names for its case
+const JUDGE = new WeakMap(); // run -> Set of llm/baseline grader names for its case
+const isIndicator = (run, g) => g.withOnly || IND.get(run)?.has(g.name);
+const scored = run => (run.graders || []).filter(g => g.scored && !isIndicator(run, g));
+const isJudge = (run, g) => !!g.judgeVotes || JUDGE.get(run)?.has(g.name);
 function likeForLike(run) {
+  // Aborted runs and runs that ended on an API error score 0 without grading.
+  if (run.aborted || (run.error && !(run.graders || []).length)) return { score: 0, pass: false };
   const gs = scored(run);
-  const w = gs.reduce((a, g) => a + g.weight, 0);
-  if (!w) return { score: null, pass: false };
-  return { score: gs.filter(g => g.passed).reduce((a, g) => a + g.weight, 0) / w, pass: gs.every(g => g.passed) };
+  const w = gs.reduce((a, g) => a + (g.weight ?? 1), 0);
+  if (!w) return { score: run.score ?? null, pass: !!run.passed };
+  return { score: gs.filter(g => g.passed).reduce((a, g) => a + (g.weight ?? 1), 0) / w, pass: gs.every(g => g.passed) };
+}
+
+function tagRuns(c) {
+  const defs = c.graders || [];
+  const ind = new Set(defs.filter(g => (g.type === 'tool_used' && g.config?.tool === 'Skill' && (g.arm ?? g.config?.arm) !== 'both') || (g.arm ?? g.config?.arm) === 'with-only').map(g => g.name));
+  // Docs: when every grader of a case is excluded, they are scored normally instead.
+  const all = new Set([...defs.map(g => g.name), ...Object.values(c.arms || {}).flat().flatMap(r => (r.graders || []).map(g => g.name))]);
+  const withOnly = new Set(Object.values(c.arms || {}).flat().flatMap(r => (r.graders || []).filter(g => g.withOnly).map(g => g.name)));
+  const allExcluded = [...all].every(n => ind.has(n) || withOnly.has(n));
+  const judge = new Set(defs.filter(g => g.type === 'llm' || g.type === 'baseline').map(g => g.name));
+  for (const r of Object.values(c.arms || {}).flat()) {
+    IND.set(r, allExcluded ? new Set() : ind);
+    JUDGE.set(r, judge);
+    if (allExcluded) r.graders?.forEach(g => { g.withOnly = false; });
+  }
 }
 
 function analyse(data, fileName) {
-  const arms = ['with', 'without'].filter(a => data.cases.some(c => (c.arms[a] || []).length));
+  const arms = ['with', 'without'].filter(a => data.cases.some(c => (c.arms?.[a] || []).length));
   const baselineOnly = /-baseline\.json$/.test(fileName);
   const labels = { with: baselineOnly ? 'baseline' : 'skill', without: 'baseline' };
-  const skillFiredScored = data.cases.some(c => (c.arms.with || []).some(r => r.graders.some(g => g.name === 'skill-fired' && g.scored)));
+  data.cases.forEach(tagRuns);
+  // Under --ablation none the CLI scores indicator graders; this viewer leaves them out.
+  const skillFiredScored = data.cases.some(c => (c.arms?.with || []).some(r => (r.graders || []).some(g => g.scored && isIndicator(r, g))));
 
   const armStats = {};
   for (const a of arms) {
-    const runs = data.cases.flatMap(c => c.arms[a] || []);
+    const runs = data.cases.flatMap(c => c.arms?.[a] || []);
     const lfl = runs.map(likeForLike);
-    const judge = runs.flatMap(r => scored(r).filter(g => g.name === 'quality').map(g => g.passed));
-    const fired = runs.flatMap(r => r.graders.filter(g => g.name === 'skill-fired').map(g => g.passed));
+    const judge = runs.flatMap(r => scored(r).filter(g => isJudge(r, g)).map(g => g.passed));
+    const fired = runs.flatMap(r => (r.graders || []).filter(g => isIndicator(r, g)).map(g => g.passed));
     armStats[a] = {
       n: runs.length,
       score: mean(lfl.filter(x => x.score != null).map(x => x.score)),
       fullPass: mean(lfl.map(x => +x.pass)),
-      detPass: mean(runs.map(r => +scored(r).filter(g => g.name !== 'quality').every(g => g.passed))),
+      detPass: mean(runs.map(r => +scored(r).filter(g => !isJudge(r, g)).every(g => g.passed))),
       judgePass: mean(judge.map(Number)),
       cost: mean(runs.map(r => r.costUsd)),
       judgeCost: mean(runs.map(r => r.judgeCostUsd || 0)),
@@ -285,20 +391,25 @@ function analyse(data, fileName) {
       turns: mean(runs.map(r => r.turns)),
       fired: fired.length && labels[a] === 'skill' ? mean(fired.map(Number)) : null,
       errors: runs.filter(r => r.error).length,
+      skipped: runs.filter(r => r.skippedPaidGraders).length,
     };
   }
 
-  const graderNames = [...new Set(data.cases.flatMap(c => c.graders.map(g => g.name)))]
-    .sort((x, y) => (x === 'quality') - (y === 'quality') || (x === 'skill-fired') - (y === 'skill-fired') || x.localeCompare(y));
+  const allRuns = data.cases.flatMap(c => Object.values(c.arms || {}).flat());
+  const indNames = new Set(allRuns.flatMap(r => (r.graders || []).filter(g => isIndicator(r, g)).map(g => g.name)));
+  const judgeNames = new Set(allRuns.flatMap(r => (r.graders || []).filter(g => isJudge(r, g)).map(g => g.name)));
+  const rank = n => indNames.has(n) ? 2 : judgeNames.has(n) ? 1 : 0;
+  const graderNames = [...new Set(data.cases.flatMap(c => [...(c.graders || []), ...Object.values(c.arms || {}).flat().flatMap(r => r.graders || [])].map(g => g.name)))]
+    .sort((x, y) => rank(x) - rank(y) || x.localeCompare(y));
 
   const cases = data.cases.map(c => {
     const per = {};
     for (const a of arms) {
-      const runs = c.arms[a] || [];
+      const runs = c.arms?.[a] || [];
       const lfl = runs.map(likeForLike);
       const graders = {};
       for (const gn of graderNames) {
-        const vs = runs.flatMap(r => r.graders.filter(g => g.name === gn).map(g => +g.passed));
+        const vs = runs.flatMap(r => (r.graders || []).filter(g => g.name === gn).map(g => +g.passed));
         graders[gn] = vs.length ? mean(vs) : null;
       }
       per[a] = { runs, score: mean(lfl.filter(x => x.score != null).map(x => x.score)), pass: mean(lfl.map(x => +x.pass)), graders };
@@ -308,10 +419,46 @@ function analyse(data, fileName) {
   });
   cases.sort((x, y) => (y.delta ?? y.per.with?.score ?? 0) - (x.delta ?? x.per.with?.score ?? 0));
 
-  return { arms, labels, armStats, cases, graderNames, skillFiredScored };
+  return { arms, labels, armStats, cases, graderNames, skillFiredScored, indNames };
 }
 
+const tip = k => EXPLAIN[k] ? `<button type="button" class="tip" data-tip="${k}" aria-label="Explain: ${esc(EXPLAIN[k].t)}" aria-expanded="false">i</button>` : '';
+
+function openTip(btn) {
+  const box = $('#tipbox'), e = EXPLAIN[btn.dataset.tip];
+  const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+  closeTip();
+  if (wasOpen) return;
+  box.innerHTML = `<h4>${esc(e.t)}</h4>${e.b}<div class="src">${e.src === 'docs'
+    ? `<span class="badge">Claude Code docs</span><a href="${DOCS}#${e.a}" target="_blank" rel="noopener">${esc(e.a.replace(/-/g, ' '))} ↗</a>`
+    : `<span class="badge viewer">This viewer</span><span>computed from the runs · <a href="${DOCS}#${e.a}" target="_blank" rel="noopener">docs ↗</a></span>`}</div>`;
+  box.hidden = false;
+  btn.setAttribute('aria-expanded', 'true');
+  const r = btn.getBoundingClientRect(), w = box.offsetWidth;
+  box.style.left = `${Math.max(16, Math.min(r.left + scrollX - 20, scrollX + innerWidth - w - 16))}px`;
+  box.style.top = `${r.bottom + scrollY + 8}px`;
+}
+function closeTip() {
+  $('#tipbox').hidden = true;
+  document.querySelectorAll('.tip[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+}
+document.addEventListener('click', e => {
+  const btn = e.target.closest?.('.tip');
+  if (btn) { e.stopPropagation(); return openTip(btn); }
+  if (!e.target.closest?.('#tipbox')) closeTip();
+}, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTip(); });
+
 function render() {
+  closeTip();
+  try { renderPage(); } catch (e) {
+    console.error(e);
+    $('#hero').innerHTML = '';
+    $('#main').innerHTML = `<div class="empty"><b class="neg">Could not render ${esc(state.name)}</b><br>${esc(e.message)}<br><small>The file parsed, but its shape differs from what this viewer expects. Please share it so the viewer can be fixed.</small></div>`;
+  }
+}
+
+function renderPage() {
   const d = state.data;
   if (!d) {
     $('#hero').innerHTML = '';
@@ -336,36 +483,38 @@ function render() {
       <span class="chip">Claude Code <b>${esc(d.claudeVersion)}</b></span>
       <span class="chip">plugin <b>${esc(plugin)}</b></span>
       <span class="chip">started <b>${esc(started)}</b></span>
-      ${d.partial ? '<span class="chip warn">partial result</span>' : ''}
-      ${A.skillFiredScored ? '<span class="chip warn">skill-fired scored — excluded below</span>' : ''}
+      <span class="chip">threshold <b>${esc(s.threshold ?? 1)}</b>${tip('threshold')}</span>
+      ${d.aggregates ? `<span class="chip">CLI: score <b>${num(d.aggregates.overallScore)}</b> · passed <b>${d.aggregates.casesPassed}/${d.aggregates.casesTotal}</b>${d.aggregates.meanDelta != null ? ` · mean Δ <b>${signed(d.aggregates.meanDelta)}</b>` : ''}${tip('cli')}</span>` : ''}
+      ${d.partial ? `<span class="chip warn">partial result${d.partialReason ? `: ${esc(d.partialReason)}` : ''}${tip('partial')}</span>` : ''}
+      ${A.skillFiredScored ? `<span class="chip warn">indicators scored by the CLI, excluded here${tip('ablationNone')}</span>` : ''}
     </div>
     <div class="kpis">
-      ${both ? `<div class="kpi hl"><div class="label">Mean score Δ (skill − baseline)</div><div class="value ${W.score - B.score < 0 ? 'neg' : ''}">${signed(W.score - B.score)}</div><div class="sub">across ${A.cases.length} cases</div></div>` : ''}
-      <div class="kpi"><div class="label">Mean score · ${esc(A.labels.with)}</div><div class="value">${num(W.score)}</div><div class="sub">full pass ${pct(W.fullPass)}</div></div>
-      ${both ? `<div class="kpi"><div class="label">Mean score · baseline</div><div class="value">${num(B.score)}</div><div class="sub">full pass ${pct(B.fullPass)}</div></div>` : ''}
-      <div class="kpi"><div class="label">Runs</div><div class="value">${W.n + (B?.n || 0)}</div><div class="sub">${A.cases.length} cases × ${runsPerCase ?? '?'} × ${A.arms.length} arm${A.arms.length > 1 ? 's' : ''}</div></div>
-      <div class="kpi"><div class="label">Total cost</div><div class="value">${usd(d.costUsd)}</div><div class="sub">incl. LLM judge</div></div>
-      <div class="kpi"><div class="label">Wall clock</div><div class="value">${d.durationSeconds}s</div><div class="sub">concurrency ${s.concurrency}</div></div>
+      ${both ? `<div class="kpi hl"><div class="label">Mean score Δ (skill − baseline)${tip('delta')}</div><div class="value ${W.score - B.score < 0 ? 'neg' : ''}">${signed(W.score - B.score)}</div><div class="sub">across ${A.cases.length} cases</div></div>` : ''}
+      <div class="kpi"><div class="label">Mean score · ${esc(A.labels.with)}${tip('score')}</div><div class="value">${num(W.score)}</div><div class="sub">full pass ${pct(W.fullPass)}</div></div>
+      ${both ? `<div class="kpi"><div class="label">Mean score · baseline${tip('baseline')}</div><div class="value">${num(B.score)}</div><div class="sub">full pass ${pct(B.fullPass)}</div></div>` : ''}
+      <div class="kpi"><div class="label">Runs${tip('runs')}</div><div class="value">${W.n + (B?.n || 0)}</div><div class="sub">${A.cases.length} cases × ${runsPerCase ?? '?'} × ${A.arms.length} arm${A.arms.length > 1 ? 's' : ''}</div></div>
+      <div class="kpi"><div class="label">Total cost${tip('cost')}</div><div class="value">${usd(d.costUsd)}</div><div class="sub">incl. LLM judge</div></div>
+      <div class="kpi"><div class="label">Wall clock${tip('wall')}</div><div class="value">${d.durationSeconds}s</div><div class="sub">concurrency ${s.concurrency}</div></div>
     </div>`;
 
   $('#main').innerHTML = `
     <section class="block">
-      <div class="sec-head"><span class="sec-num">01</span><h2>Arm <span class="serif">comparison</span></h2></div>
-      <p class="sec-lead">Same cases, same prompts. Scores are the weighted grader score with <code>skill-fired</code> left out, so both arms sit on one scale. Cost per run includes the judge.</p>
+      <div class="sec-head"><span class="sec-num">01</span><h2>Arm <span class="serif">comparison</span>${tip('arm')}</h2></div>
+      <p class="sec-lead">Same cases, same prompts. Scores are the weighted grader score with indicator graders such as <code>tool_used: Skill</code> left out, so both arms sit on one scale. Cost per run includes the judge.</p>
       <div class="card">${legend(A)}${armBars(A)}</div>
     </section>
     <section class="block">
-      <div class="sec-head"><span class="sec-num">02</span><h2>Per <span class="serif">case</span></h2></div>
+      <div class="sec-head"><span class="sec-num">02</span><h2>Per <span class="serif">case</span>${tip('perCase')}</h2></div>
       <p class="sec-lead">Mean score per case on a 0–1 scale, sorted by ${both ? 'the gap between the arms' : 'score'}. Click a case to see every run.</p>
       <div class="card">${legend(A)}${dumbbell(A)}</div>
     </section>
     <section class="block">
-      <div class="sec-head"><span class="sec-num">03</span><h2>Grader <span class="serif">matrix</span></h2></div>
-      <p class="sec-lead">Pass rate of each grader per case. Empty cells: the grader does not apply to that case. Dashed graders are indicators and do not count toward the score.</p>
+      <div class="sec-head"><span class="sec-num">03</span><h2>Grader <span class="serif">matrix</span>${tip('matrix')}</h2></div>
+      <p class="sec-lead">Pass rate of each grader per case. Empty cells: the grader does not apply to that case. Italic graders are indicators and do not count toward the score.</p>
       <div class="card" id="hm"></div>
     </section>
     <section class="block" id="detail-sec">
-      <div class="sec-head"><span class="sec-num">04</span><h2>Case <span class="serif">detail</span></h2></div>
+      <div class="sec-head"><span class="sec-num">04</span><h2>Case <span class="serif">detail</span>${tip('detail')}</h2></div>
       <div id="detail"></div>
     </section>`;
 
@@ -384,9 +533,9 @@ function armBars(A) {
   const metrics = [
     ['Mean score', 'weighted graders, 0–1', 'score', 1, v => num(v)],
     ['Full pass rate', 'every scored grader passed', 'fullPass', 1, pct],
-    ['Deterministic pass rate', 'every regex grader passed', 'detPass', 1, pct],
-    ['Judge PASS', 'LLM judge, majority of votes', 'judgePass', 1, pct],
-    ['Skill fired', 'Skill tool called at least once', 'fired', 1, pct],
+    ['Deterministic pass rate', 'every non-judge grader passed', 'detPass', 1, pct],
+    ['Judge PASS', 'llm / baseline graders, 2 of 3 votes', 'judgePass', 1, pct],
+    ['Skill fired', 'indicator, not scored', 'fired', 1, pct],
     ['Cost / run', 'agent + judge', 'cost', null, v => usd(v, 4)],
     ['Time / run', 'seconds', 'time', null, v => `${num(v, 1)}s`],
     ['Turns / run', '', 'turns', null, v => num(v, 1)],
@@ -395,7 +544,7 @@ function armBars(A) {
     const vals = A.arms.map(a => A.armStats[a][key]);
     if (vals.every(v => v == null)) return '';
     const m = max ?? (Math.max(...vals.filter(v => v != null)) * 1.1 || 1);
-    return `<div class="metric"><div class="name">${name}<small>${sub}</small></div><div class="bars">${A.arms.map(a => {
+    return `<div class="metric"><div class="name">${name}${tip(`m_${key}`)}<small>${sub}</small></div><div class="bars">${A.arms.map(a => {
       const v = A.armStats[a][key];
       return `<div class="bar"><div class="track"><div class="fill" style="width:${v == null ? 0 : 100 * v / m}%;background:${armColor(A, a)}"></div></div><span class="v">${v == null ? 'n/a' : fmt(v)}</span></div>`;
     }).join('')}</div></div>`;
@@ -425,7 +574,7 @@ function renderHeatmap() {
   const A = state.A;
   const opts = A.arms.length > 1 ? [['with', A.labels.with], ['without', 'baseline'], ['delta', 'Δ skill − baseline']] : [['with', A.labels.with]];
   if (!opts.some(o => o[0] === state.hmArm)) state.hmArm = 'with';
-  const unscored = new Set(A.cases.flatMap(c => c.raw.arms.with?.[0]?.graders.filter(g => !g.scored).map(g => g.name) || []));
+  const unscored = A.indNames;
   const cell = (c, g) => {
     let v;
     if (state.hmArm === 'delta') {
@@ -457,17 +606,20 @@ function renderDetail() {
   const meta = c.raw;
   const runCard = (r, i) => {
     const lfl = likeForLike(r);
-    const graders = r.graders.map(g => {
+    const graders = (r.graders || []).map(g => {
       const votes = g.judgeVotes ? `<span class="votes">${g.judgeVotes.map(v => `<i style="background:${v ? 'var(--brand-mint)' : 'var(--red)'}"></i>`).join('')}</span>` : '';
-      return `<span class="g ${g.passed ? 'ok' : 'bad'} ${g.scored ? '' : 'unscored'}" title="${esc(g.explanation)}">${g.passed ? '✓' : '✗'} ${esc(g.name)} ×${g.weight}${votes}</span>`;
+      return `<span class="g ${g.passed ? 'ok' : 'bad'} ${g.scored && !isIndicator(r, g) ? '' : 'unscored'}" title="${esc(g.explanation)}">${g.passed ? '✓' : '✗'} ${esc(g.name)} ×${g.weight ?? 1}${votes}</span>`;
     }).join('');
-    const ev = r.graders.find(g => g.evidence)?.evidence;
+    const ev = (r.graders || []).find(g => g.evidence)?.evidence;
     return `<div class="run">
       <div class="run-head"><span class="score">${num(lfl.score)}</span>
         <span class="verdict ${lfl.pass ? 'ok' : 'bad'}">${lfl.pass ? 'PASS' : 'FAIL'}</span>
         <span>run ${i + 1}</span><span>${usd(r.costUsd, 4)}</span><span>${r.durationSeconds}s</span><span>${r.turns} turns</span></div>
-      <div class="graders">${graders}</div>
-      ${r.error ? `<div class="err">error: ${esc(r.error)}</div>` : ''}
+      ${r.aborted || r.skippedPaidGraders ? `<div class="run-flags">
+        ${r.aborted ? `<span class="chip warn">aborted by mock: ${esc([r.aborted.server, r.aborted.tool].filter(Boolean).join(' · '))}${r.aborted.reason ? ` · ${esc(r.aborted.reason)}` : ''}</span>` : ''}
+        ${r.skippedPaidGraders ? '<span class="chip warn">judge skipped: cost ceiling, score not comparable</span>' : ''}</div>` : ''}
+      <div class="graders">${graders || '<span class="m">no grader results</span>'}</div>
+      ${r.error ? `<div class="err">error: ${esc(r.error)}${(r.graders || []).length ? ' (still graded on what it produced)' : ' (scored 0 without grading)'}</div>` : ''}
       ${ev ? `<details><summary>Answer (grader evidence)</summary><pre>${esc(ev)}</pre></details>` : ''}
     </div>`;
   };
@@ -515,6 +667,26 @@ async function select(key) {
   show(key, await r.json(), sources.server.find(f => f.id === id)?.name);
 }
 
+// Load a source on request and make the change visible: the page body sits below the panel.
+async function load(key, note) {
+  await select(key);
+  if (current !== key) return;
+  toast(note || `Showing ${state.name}`);
+  const hero = $('#hero');
+  hero.classList.remove('flash'); void hero.offsetWidth; hero.classList.add('flash');
+}
+
+let toastTimer;
+function toast(text, bad = false) {
+  const t = $('#toast');
+  t.querySelector('.t').textContent = text;
+  t.classList.toggle('bad', bad);
+  t.querySelector('button').hidden = bad || !state.data;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 6000);
+}
+
 function renderSelect() {
   const opt = (k, n) => `<option value="${esc(k)}">${esc(n)}</option>`;
   const groups = [];
@@ -529,17 +701,20 @@ function renderSelect() {
 }
 
 function renderDropList() {
-  const items = [...sources.local.entries()].map(([n, s]) => `
-    <div class="dz-item ${current === `local:${n}` ? 'cur' : ''}">
-      <span class="n" data-open="${esc(n)}">${esc(n)}</span>
-      <span class="m">${s.data.cases.length} cases · ${esc(s.data.suite.ablation || '')}</span>
-      <button data-rm="${esc(n)}" aria-label="Remove ${esc(n)}">✕</button>
-    </div>`).join('');
+  const items = [...sources.local.entries()].map(([n, s]) => {
+    const on = current === `local:${n}`;
+    const when = s.data.startedAt ? new Date(s.data.startedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '';
+    return `<div class="dz-item ${on ? 'cur' : ''}">
+      <div class="n">${esc(n)}<small>${s.data.cases.length} cases · ${esc(s.data.suite.ablation || '')}${when ? ` · ${esc(when)}` : ''}</small></div>
+      ${on ? '<span class="dz-showing">✓ Showing</span>' : `<button class="btn dz-load" data-open="${esc(n)}">Load</button>`}
+      <button class="dz-rm" data-rm="${esc(n)}" aria-label="Remove ${esc(n)}">✕</button>
+    </div>`;
+  }).join('');
   const bad = rejected.map(r => `<div class="dz-bad">✗ ${esc(r)}</div>`).join('');
   $('#dz-list').innerHTML = `
-    <div class="dz-head"><span>${sources.local.size} dropped file${sources.local.size === 1 ? '' : 's'}</span>${sources.local.size ? '<button class="dz-clear" id="dz-clear">Clear all</button>' : ''}</div>
-    ${items || '<div class="dz-item"><span class="m">Nothing dropped yet.</span></div>'}${bad}`;
-  $('#dz-list').querySelectorAll('[data-open]').forEach(el => el.onclick = () => select(`local:${el.dataset.open}`));
+    <div class="dz-head"><span>${sources.local.size} result${sources.local.size === 1 ? '' : 's'} loaded${sources.local.size > 1 ? ' · pick one to view' : ''}</span>${sources.local.size ? '<button class="dz-clear" id="dz-clear">Clear all</button>' : ''}</div>
+    ${items || '<div class="dz-item"><span class="m">Nothing loaded yet. Drop files or a folder, or use the buttons on the left.</span></div>'}${bad}`;
+  $('#dz-list').querySelectorAll('[data-open]').forEach(el => el.onclick = () => load(`local:${el.dataset.open}`));
   $('#dz-list').querySelectorAll('[data-rm]').forEach(el => el.onclick = () => removeLocal([el.dataset.rm]));
   const clear = $('#dz-clear');
   if (clear) clear.onclick = () => removeLocal([...sources.local.keys()]);
@@ -550,7 +725,7 @@ function removeLocal(names) {
   rejected = [];
   renderSelect();
   if (names.some(n => current === `local:${n}`)) {
-    const next = sources.local.size ? `local:${[...sources.local.keys()].at(-1)}` : sources.server[0] && `server:${sources.server[0].name}`;
+    const next = sources.local.size ? `local:${[...sources.local.keys()].at(-1)}` : sources.server[0] && `server:${sources.server[0].id}`;
     if (next) return select(next);
     current = ''; state.data = null; render();
   }
@@ -589,14 +764,15 @@ async function openLocal(fileList) {
   // Newest run first, like the server listing.
   found.sort((a, b) => String(b.data.startedAt).localeCompare(String(a.data.startedAt)));
   let first = null;
-  for (const { name, data } of found) {
-    const n = uniqueName(name);
-    sources.local.set(n, { data });
-    first ??= n;
+  const both = found.find(f => f.data.suite.ablation === 'with-without') || found[0];
+  for (const f of found) {
+    const n = uniqueName(f.name);
+    sources.local.set(n, { data: f.data });
+    if (f === both) first = n;
   }
   renderSelect();
-  if (first) await select(`local:${first}`);
-  else renderDropList();
+  if (first) await load(`local:${first}`, `Loaded ${found.length} result${found.length === 1 ? '' : 's'} · showing ${first}`);
+  else { renderDropList(); toast(rejected[0] || 'No eval results found', true); }
   // Rejections would otherwise go unseen with the panel closed.
   if (rejected.length) setDropzone(true);
 }
@@ -655,7 +831,7 @@ async function addFolder(path, quiet = false) {
   msg.textContent = `${res.label}: ${res.found} result file${res.found === 1 ? '' : 's'} found.`;
   const mine = files.filter(f => f.root === res.root);
   const pick = mine.find(f => f.ablation === 'with-without') || mine[0];
-  if (pick) await select(`server:${pick.id}`);
+  if (pick) await load(`server:${pick.id}`, `${res.label}: ${res.found} result${res.found === 1 ? '' : 's'} · showing the newest`);
 }
 
 // Folders added from the page are re-added after a server restart.
@@ -671,12 +847,15 @@ function setDropzone(open) {
   if (open) renderDropList();
 }
 
-$('#file').onchange = e => select(e.target.value);
+$('#file').onchange = e => load(e.target.value);
 $('#upload').onchange = e => { openLocal(e.target.files); e.target.value = ''; };
 $('#upload-dir').onchange = e => { openLocal(e.target.files); e.target.value = ''; };
 $('#dz-folder').onsubmit = e => { e.preventDefault(); const p = $('#dz-path').value.trim(); if (p) addFolder(p); };
 $('#dz-toggle').onclick = () => setDropzone($('#dropzone').hidden);
 $('#dz-target').onclick = () => $('#upload').click();
+$('#dz-files').onclick = e => { e.stopPropagation(); $('#upload').click(); };
+$('#dz-dir').onclick = e => { e.stopPropagation(); $('#upload-dir').click(); };
+$('#toast button').onclick = () => { $('#toast').classList.remove('on'); $('#hero').scrollIntoView({ behavior: 'smooth' }); };
 $('#dz-target').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#upload').click(); } };
 // The whole page stays a drop target; the panel is just a visible one.
 document.addEventListener('dragover', e => {

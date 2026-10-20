@@ -62,9 +62,19 @@ leave the tab. Docker mounts are read-only.
 | **03 Grader matrix** | Pass rate per case × grader, toggled between skill, baseline and Δ. |
 | **04 Case detail** | Every run: grader verdicts (hover for the reason), judge votes, the answer and the prompt. |
 
+Every section, KPI and metric has an **ⓘ** explainer. Each one is tagged either
+**Claude Code docs**, with a link to the exact section of the
+[plugin eval docs](https://code.claude.com/docs/en/plugin-evals), or
+**This viewer**, for numbers the page computes itself (full pass rate,
+deterministic pass rate). The CLI's own `overallScore`, `casesPassed` and
+`meanDelta`, plus the `--threshold`, appear next to the recomputed tiles.
+
 > [!NOTE]
-> Scores leave out the `skill-fired` grader, so both arms sit on one scale, even
-> under `--ablation none`, where that grader is scored.
+> Scoring follows the docs: a run's score is the weighted fraction of scored
+> graders that passed. Aborted runs, and runs that ended on an API error, score 0.
+> Indicator graders (`tool_used: Skill`, `arm: with-only`) are left out. The viewer
+> also leaves them out under `--ablation none`, where the CLI scores them, so the
+> two modes compare on one scale.
 
 ## Getting results in
 
@@ -80,6 +90,10 @@ python3 serve.py --results a/ --results b/ --cases path/to/evals/cases --open
 | **Add folder** (Dropzone panel) | server | Type any local path. It is remembered and re-added after a server restart. |
 | **Open folder…** / drag a folder | browser | Nothing is uploaded. Works with `index.html` opened straight from disk. |
 | **Open JSON…** / drag files | browser | A non-result file dropped on its own is listed with the reason. |
+
+After a drop, the Dropzone panel lists every result found, each with a **Load**
+button. The one on screen is marked **✓ Showing**, and a toast confirms the switch
+with a **View results ↓** shortcut.
 
 The dropdown groups results by folder, newest first. Case tags come from
 `tags.json` and from the `tags: [...]` line of `evals/cases/<case>/prompt.md`
