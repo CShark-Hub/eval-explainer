@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>Trust, but eval</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -175,6 +176,12 @@ footer .small { color: var(--muted); font-size: .875rem; }
 .dz-item button:hover, .dz-clear:hover { color: var(--red); }
 .dz-bad { color: var(--red); padding: 4px 8px; }
 .dz-head { display: flex; justify-content: space-between; color: var(--neutral-300); margin-bottom: 6px; padding: 0 8px; }
+.dz-folder { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: rgba(23,23,23,.7); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+.dz-folder[hidden] { display: none; }
+.dz-folder input { flex: 1; min-width: 220px; background: var(--black); color: var(--text); border: 1.5px solid var(--neutral-700); border-radius: 9999px; padding: .5rem 1rem; font: inherit; font-size: .875rem; }
+.dz-folder input:focus { outline: none; border-color: var(--brand-violet); }
+.dz-folder .msg { flex-basis: 100%; font-size: .8rem; color: var(--muted); padding: 0 8px; }
+.dz-folder .msg.bad { color: var(--red); }
 @media (max-width: 767px) { .dropzone { grid-template-columns: 1fr; } }
 
 .empty { padding: 120px 0; text-align: center; color: var(--muted); }
@@ -205,14 +212,20 @@ footer .small { color: var(--muted); font-size: .875rem; }
       <span class="nav-spacer"></span>
       <select id="file" aria-label="Result file"></select>
       <button class="btn" id="dz-toggle" aria-expanded="false" aria-controls="dropzone">Dropzone</button>
+      <label class="btn">Open folder…<input id="upload-dir" type="file" webkitdirectory multiple hidden></label>
       <label class="btn btn-mint">Open JSON…<input id="upload" type="file" accept=".json,application/json" multiple hidden></label>
     </nav>
     <div id="dropzone" class="dropzone" hidden>
       <div class="dz-target" id="dz-target" tabindex="0" role="button">
         <div class="dz-title">Drop <span class="serif">eval results</span> here</div>
-        <div class="dz-sub">Any number of <code>claude plugin eval --json</code> files. Each one becomes a source in the dropdown, viewed one at a time. Files stay in this tab.</div>
+        <div class="dz-sub">Result files or whole folders (a plugin, its <code>evals/</code> or <code>evals/results/</code>). Eval output is found inside automatically; each result becomes a source in the dropdown. Files stay in this tab.</div>
       </div>
       <div id="dz-list"></div>
+      <form class="dz-folder" id="dz-folder" hidden>
+        <input id="dz-path" type="text" placeholder="/path/to/plugin  or  ~/plugins/my-plugin/evals" aria-label="Folder path on this machine" autocomplete="off" spellcheck="false">
+        <button class="btn btn-mint" type="submit">Add folder</button>
+        <div class="msg" id="dz-msg">The local server scans the folder and its subfolders for eval results, and picks up new runs on reload.</div>
+      </form>
     </div>
     <div id="hero"></div>
   </div>
@@ -302,7 +315,7 @@ function render() {
   const d = state.data;
   if (!d) {
     $('#hero').innerHTML = '';
-    $('#main').innerHTML = `<div class="empty">No result files on the server. Drop <code>claude plugin eval --json</code> files here, or start <code>serve.py --results DIR</code>.</div>`;
+    $('#main').innerHTML = `<div class="empty">No result files on the server. Drop result files or a folder here, add a folder path in the Dropzone panel, or start <code>serve.py --results DIR</code>.</div>`;
     return;
   }
   const A = analyse(d, state.name);
@@ -484,11 +497,11 @@ let rejected = [];
 
 const isResult = d => d && Array.isArray(d.cases) && d.suite;
 
-function show(key, data) {
+function show(key, data, name) {
   current = key;
-  state.data = data; state.name = key.slice(key.indexOf(':') + 1); state.sel = null;
+  state.data = data; state.name = name ?? key.slice(key.indexOf(':') + 1); state.sel = null;
   $('#file').value = key;
-  if (key.startsWith('server:')) history.replaceState(null, '', `#${encodeURIComponent(state.name)}`);
+  if (key.startsWith('server:')) history.replaceState(null, '', `#${encodeURIComponent(key.slice(7))}`);
   else history.replaceState(null, '', location.pathname);
   render();
   renderDropList();
@@ -496,15 +509,18 @@ function show(key, data) {
 
 async function select(key) {
   if (key.startsWith('local:')) return show(key, sources.local.get(key.slice(6)).data);
-  const name = key.slice(7);
-  const r = await fetch(`/api/results/${encodeURIComponent(name)}`);
-  show(key, await r.json());
+  const id = key.slice(7);
+  const r = await fetch(`/api/result?id=${encodeURIComponent(id)}`);
+  if (!r.ok) return refreshServer();  // deleted or moved since the listing
+  show(key, await r.json(), sources.server.find(f => f.id === id)?.name);
 }
 
 function renderSelect() {
   const opt = (k, n) => `<option value="${esc(k)}">${esc(n)}</option>`;
   const groups = [];
-  if (sources.server.length) groups.push(`<optgroup label="Server">${sources.server.map(f => opt(`server:${f.name}`, f.name)).join('')}</optgroup>`);
+  // One group per scanned folder; option text is the path below it.
+  const byRoot = sources.server.reduce((m, f) => m.set(f.root, [...(m.get(f.root) || []), f]), new Map());
+  for (const [, fs] of byRoot) groups.push(`<optgroup label="${esc(fs[0].rootLabel)}">${fs.map(f => opt(`server:${f.id}`, f.name.slice(f.name.indexOf('/') + 1))).join('')}</optgroup>`);
   if (sources.local.size) groups.push(`<optgroup label="Dropped">${[...sources.local.keys()].map(n => opt(`local:${n}`, n)).join('')}</optgroup>`);
   const sel = $('#file');
   sel.innerHTML = groups.join('');
@@ -548,26 +564,104 @@ function uniqueName(name) {
   return `${name} (${i})`;
 }
 
+const relPath = f => f.relPath || f.webkitRelativePath || f.name;
+const SKIP_DIRS = /(^|\/)(\.git|node_modules|__pycache__|\.venv|venv)\//;
+
+// Files picked or dropped one by one must be results; files that came from a folder
+// are sniffed, and anything that is not eval output is skipped quietly.
 async function openLocal(fileList) {
-  const files = [...fileList].filter(f => f.name.endsWith('.json') || f.type === 'application/json');
-  rejected = [...fileList].filter(f => !files.includes(f)).map(f => `${f.name}: not a .json file`);
-  let first = null;
+  const all = [...fileList].filter(f => !SKIP_DIRS.test(relPath(f)));
+  const fromFolder = f => relPath(f).includes('/');
+  const files = all.filter(f => f.name.endsWith('.json') && f.name !== 'tags.json');
+  rejected = all.filter(f => !fromFolder(f) && !f.name.endsWith('.json')).map(f => `${f.name}: not a .json file`);
+  await readLocalTags(all);
+  const found = [];
   for (const f of files) {
     try {
       const data = JSON.parse(await f.text());
       if (!isResult(data)) throw new Error('not a `claude plugin eval --json` result');
-      const name = uniqueName(f.name);
-      sources.local.set(name, { data });
-      first ??= name;
+      found.push({ name: relPath(f), data });
     } catch (e) {
-      rejected.push(`${f.name}: ${e.message}`);
+      if (!fromFolder(f)) rejected.push(`${f.name}: ${e.message}`);
     }
+  }
+  if (!found.length && all.some(fromFolder)) rejected.push(`${relPath(all[0]).split('/')[0]}/: no eval results found inside`);
+  // Newest run first, like the server listing.
+  found.sort((a, b) => String(b.data.startedAt).localeCompare(String(a.data.startedAt)));
+  let first = null;
+  for (const { name, data } of found) {
+    const n = uniqueName(name);
+    sources.local.set(n, { data });
+    first ??= n;
   }
   renderSelect();
   if (first) await select(`local:${first}`);
   else renderDropList();
   // Rejections would otherwise go unseen with the panel closed.
   if (rejected.length) setDropzone(true);
+}
+
+// tags.json anywhere in the folder, and the `tags:` line of <cases>/<case>/prompt.md.
+async function readLocalTags(files) {
+  for (const f of files) {
+    const parts = relPath(f).split('/');
+    try {
+      if (f.name === 'tags.json') Object.assign(TAGS, JSON.parse(await f.text()));
+      else if (f.name === 'prompt.md' && parts.at(-3) === 'cases') {
+        const line = (await f.text()).split('\n').find(l => l.startsWith('tags:'));
+        if (line) TAGS[parts.at(-2)] = JSON.parse(line.slice(5));
+      }
+    } catch {}
+  }
+}
+
+// Folders dragged onto the page: walk them with the entries API.
+async function entryFiles(entry, path = '') {
+  if (entry.isFile) {
+    const f = await new Promise((res, rej) => entry.file(res, rej));
+    f.relPath = path + f.name;
+    return [f];
+  }
+  if (!entry.isDirectory || SKIP_DIRS.test(path + entry.name + '/')) return [];
+  const reader = entry.createReader(), out = [];
+  for (;;) {
+    const batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+    if (!batch.length) break;
+    for (const e of batch) out.push(...await entryFiles(e, `${path}${entry.name}/`));
+  }
+  return out;
+}
+
+async function refreshServer() {
+  const [files, tags] = await Promise.all([fetch('/api/results').then(r => r.json()), fetch('/api/tags').then(r => r.json())]);
+  sources.server = files;
+  Object.assign(TAGS, tags);
+  renderSelect();
+  return files;
+}
+
+async function addFolder(path, quiet = false) {
+  const msg = $('#dz-msg');
+  const r = await fetch('/api/dirs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) });
+  const res = await r.json();
+  if (!r.ok) {
+    if (!quiet) { msg.textContent = res.error; msg.className = 'msg bad'; }
+    return;
+  }
+  saveFolder(res.root);
+  const files = await refreshServer();
+  if (quiet) return;
+  msg.className = 'msg';
+  msg.textContent = `${res.label}: ${res.found} result file${res.found === 1 ? '' : 's'} found.`;
+  const mine = files.filter(f => f.root === res.root);
+  const pick = mine.find(f => f.ablation === 'with-without') || mine[0];
+  if (pick) await select(`server:${pick.id}`);
+}
+
+// Folders added from the page are re-added after a server restart.
+const savedFolders = () => { try { return JSON.parse(localStorage.getItem('viz.folders')) || []; } catch { return []; } };
+function saveFolder(root) {
+  try { localStorage.setItem('viz.folders', JSON.stringify([...new Set([...savedFolders(), root])])); } catch {}
 }
 
 function setDropzone(open) {
@@ -579,6 +673,8 @@ function setDropzone(open) {
 
 $('#file').onchange = e => select(e.target.value);
 $('#upload').onchange = e => { openLocal(e.target.files); e.target.value = ''; };
+$('#upload-dir').onchange = e => { openLocal(e.target.files); e.target.value = ''; };
+$('#dz-folder').onsubmit = e => { e.preventDefault(); const p = $('#dz-path').value.trim(); if (p) addFolder(p); };
 $('#dz-toggle').onclick = () => setDropzone($('#dropzone').hidden);
 $('#dz-target').onclick = () => $('#upload').click();
 $('#dz-target').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#upload').click(); } };
@@ -592,22 +688,24 @@ document.addEventListener('dragleave', e => { if (!e.relatedTarget) { document.b
 document.addEventListener('drop', e => {
   e.preventDefault();
   document.body.classList.remove('drop'); $('#dz-target').classList.remove('over');
-  if (e.dataTransfer.files.length) openLocal(e.dataTransfer.files);
+  const entries = [...e.dataTransfer.items || []].map(i => i.webkitGetAsEntry?.()).filter(Boolean);
+  if (entries.some(en => en.isDirectory)) Promise.all(entries.map(en => entryFiles(en))).then(fs => openLocal(fs.flat()));
+  else if (e.dataTransfer.files.length) openLocal(e.dataTransfer.files);
 });
 
 (async () => {
   let saved = null;
   try { saved = localStorage.getItem('viz.dropzone'); } catch {}
   try {
-    const [files, tags] = await Promise.all([fetch('/api/results').then(r => r.json()), fetch('/api/tags').then(r => r.json())]);
-    TAGS = tags;
-    sources.server = files;
-    renderSelect();
+    const dirs = await fetch('/api/dirs').then(r => r.json());
+    for (const d of savedFolders()) if (!dirs.includes(d)) await addFolder(d, true);
+    const files = await refreshServer();
+    $('#dz-folder').hidden = false;
     const want = decodeURIComponent(location.hash.slice(1));
-    // Prefer the newest with-without file: it is the one with both arms.
-    const pick = files.find(f => f.name === want) || files.find(f => /-both\.json$/.test(f.name)) || files[0];
+    // Prefer the newest run with both arms (with-without ablation).
+    const pick = files.find(f => f.id === want) || files.find(f => f.ablation === 'with-without') || files[0];
     setDropzone(saved === '1' || !pick);
-    if (pick) await select(`server:${pick.name}`); else render();
+    if (pick) await select(`server:${pick.id}`); else render();
   } catch {
     // Opened as a plain file (no server): the dropzone is the only way in.
     renderSelect();

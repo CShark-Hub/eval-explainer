@@ -1,5 +1,5 @@
 # docker compose up --build -d   →  http://127.0.0.1:8077
-# Your own results: RESULTS_DIR=/path/to/results CASES_DIR=/path/to/evals/cases docker compose up -d
+# Your own results: RESULTS_DIR=/path/to/plugin (scanned recursively) CASES_DIR=/path/to/evals/cases docker compose up -d
 # (CASES_DIR is optional; it only adds case tags. examples/ has no cases, so it is a harmless default.)
 services:
   explainer:
