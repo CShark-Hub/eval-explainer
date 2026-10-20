@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust, but eval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand-violet: #A201FF;
+  --brand-mint: #46F9B8;
+  --violet-300: #D285FF;
+  --violet-400: #BC49FF;
+  --violet-900: #3B005D;
+  --mint-700: #288F6A;
+  --mint-900: #0D2E22;
+  --neutral-300: #B0B0B0;
+  --neutral-400: #8F8F8F;
+  --neutral-500: #818181;
+  --neutral-600: #515151;
+  --neutral-700: #3F3F3F;
+  --neutral-800: #2A2A2A;
+  --neutral-900: #171717;
+  --red: #FF6767;
+  --black: #000;
+  --white: #fff;
+
+  --bg: var(--black);
+  --surface: var(--neutral-900);
+  --line: var(--neutral-800);
+  --text: var(--white);
+  --muted: var(--neutral-400);
+  --skill: var(--brand-mint);
+  --base: var(--neutral-500);
+
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 50px; }
+.serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+a { color: var(--brand-mint); }
+button, select { font-family: inherit; }
+
+/* nav */
+nav { position: relative; z-index: 2; display: flex; align-items: center; gap: 24px; padding: 24px 0; flex-wrap: wrap; }
+.logo { font-weight: 700; letter-spacing: .18em; font-size: 1.1rem; }
+.logo b { color: var(--brand-violet); font-weight: 700; }
+.nav-title { color: var(--muted); font-size: .875rem; }
+.nav-spacer { flex: 1; }
+select, .btn { background: transparent; color: var(--text); border: 1.5px solid var(--neutral-700); border-radius: 9999px; padding: .5rem 1rem; font-size: .875rem; font-weight: 500; cursor: pointer; }
+select option { background: var(--neutral-900); }
+.btn-mint { background: var(--brand-mint); color: var(--black); border-color: var(--brand-mint); }
+.btn:hover, select:hover { border-color: var(--brand-violet); }
+.btn-mint:hover { background: #66FFC8; }
+
+/* hero */
+.hero { position: relative; overflow: hidden; padding-bottom: 80px; }
+.blob { position: absolute; border-radius: 40% 60% 50% 50%; filter: blur(120px); pointer-events: none; }
+.blob.v { width: 55%; height: 75%; top: -10%; right: -8%; background: var(--brand-violet); opacity: .55; }
+.blob.p { width: 30%; height: 45%; top: 25%; right: 22%; background: #EB4FEE; opacity: .3; }
+.blob.m { width: 35%; height: 50%; bottom: -25%; left: -10%; background: var(--brand-mint); opacity: .22; }
+.hero .wrap { position: relative; z-index: 1; }
+.overline { text-transform: uppercase; letter-spacing: .14em; font-size: .875rem; font-weight: 500; color: var(--brand-mint); margin: 48px 0 12px; }
+h1 { font-size: 4rem; font-weight: 500; line-height: 1.1; margin: 0 0 24px; max-width: 900px; }
+h2 { font-size: 2.75rem; font-weight: 500; line-height: 1.2; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 48px; }
+.chip { border: 1.5px solid var(--neutral-700); border-radius: 9999px; padding: .25rem .875rem; font-size: .875rem; color: var(--neutral-300); background: rgba(0,0,0,.35); }
+.chip b { color: var(--text); font-weight: 500; }
+.chip.warn { border-color: var(--red); color: var(--red); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+.kpi { background: rgba(23,23,23,.7); backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.kpi .label { font-size: .875rem; color: var(--muted); line-height: 1.4; }
+.kpi .value { font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.kpi .sub { font-size: .875rem; color: var(--muted); }
+.kpi.hl { border-color: var(--brand-mint); }
+.kpi.hl .value { color: var(--brand-mint); }
+.pos { color: var(--brand-mint); } .neg { color: var(--red); }
+
+/* sections */
+section.block { padding: 80px 0 0; }
+.sec-head { display: flex; align-items: baseline; gap: 20px; margin-bottom: 12px; flex-wrap: wrap; }
+.sec-num { font-family: var(--font-serif); font-style: italic; color: var(--brand-violet); font-size: 2rem; }
+.sec-lead { color: var(--muted); max-width: 760px; margin: 0 0 32px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 28px; }
+.legend { display: flex; gap: 20px; font-size: .875rem; color: var(--neutral-300); margin-bottom: 16px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+/* arm comparison */
+.metric { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.metric:last-child { border-bottom: 0; }
+.metric .name { font-weight: 500; }
+.metric .name small { display: block; color: var(--muted); font-weight: 400; font-size: .8rem; line-height: 1.4; }
+.bars { display: grid; gap: 6px; }
+.bar { display: grid; grid-template-columns: 1fr 90px; gap: 12px; align-items: center; }
+.track { height: 12px; background: var(--neutral-800); border-radius: 9999px; overflow: hidden; }
+.fill { height: 100%; border-radius: 9999px; transition: width .5s ease; }
+.bar .v { font-size: .875rem; font-variant-numeric: tabular-nums; color: var(--neutral-300); text-align: right; }
+
+/* dumbbell */
+.db-row { display: grid; grid-template-columns: 240px 1fr 70px; gap: 16px; align-items: center; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.db-row:hover { background: var(--neutral-800); }
+.db-row.sel { background: rgba(162,1,255,.18); outline: 1px solid var(--brand-violet); }
+.db-name { font-size: .875rem; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+.tag { display: inline-block; font-size: .7rem; padding: 0 .5rem; border-radius: 9999px; background: var(--brand-mint); color: var(--black); font-weight: 500; margin-top: 4px; margin-right: 4px; }
+.tag.edge { background: var(--violet-300); }
+.tag.adversarial { background: var(--red); }
+.db-plot { position: relative; height: 22px; }
+.db-axis { position: absolute; top: 10px; left: 0; right: 0; height: 2px; background: var(--neutral-800); }
+.db-link { position: absolute; top: 9px; height: 4px; border-radius: 2px; }
+.db-dot { position: absolute; top: 4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; border: 2px solid var(--surface); }
+.db-delta { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.db-scale { display: grid; grid-template-columns: 240px 1fr 70px; gap: 16px; padding: 0 12px; font-size: .75rem; color: var(--muted); }
+.db-scale div:nth-child(2) { display: flex; justify-content: space-between; }
+
+/* heatmap */
+.toggle { display: inline-flex; border: 1.5px solid var(--neutral-700); border-radius: 9999px; padding: 3px; margin-bottom: 20px; }
+.toggle button { background: transparent; border: 0; color: var(--neutral-300); padding: .375rem 1rem; border-radius: 9999px; cursor: pointer; font-size: .875rem; font-weight: 500; }
+.toggle button.on { background: var(--brand-violet); color: var(--white); }
+.hm-scroll { overflow-x: auto; }
+table.hm { border-collapse: separate; border-spacing: 4px; font-size: .8rem; }
+table.hm th { font-weight: 500; color: var(--neutral-300); text-align: left; padding: 4px 8px; white-space: nowrap; }
+table.hm thead th { writing-mode: vertical-rl; transform: rotate(180deg); text-align: left; height: 130px; vertical-align: bottom; }
+table.hm td { width: 52px; height: 34px; text-align: center; border-radius: 6px; font-variant-numeric: tabular-nums; font-weight: 500; }
+table.hm td.na { background: transparent; color: var(--neutral-700); }
+table.hm tr.sel th { color: var(--brand-violet); }
+table.hm tbody tr { cursor: pointer; }
+
+/* detail */
+.runs { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.arm-col h3 { font-size: 1.25rem; font-weight: 500; margin: 0 0 12px; }
+.run { background: var(--black); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.run-head { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; font-size: .875rem; color: var(--muted); margin-bottom: 10px; }
+.run-head .score { font-size: 1.5rem; font-weight: 500; color: var(--text); }
+.verdict { font-size: .75rem; font-weight: 700; letter-spacing: .08em; padding: .1rem .6rem; border-radius: 9999px; }
+.verdict.ok { background: var(--brand-mint); color: var(--black); }
+.verdict.bad { background: var(--red); color: var(--black); }
+.graders { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.g { font-size: .75rem; border-radius: 9999px; padding: .1rem .6rem; border: 1.5px solid; cursor: help; }
+.g.ok { border-color: var(--mint-700); color: var(--brand-mint); }
+.g.bad { border-color: var(--red); color: var(--red); }
+.g.unscored { border-style: dashed; opacity: .7; }
+.votes { display: inline-flex; gap: 3px; margin-left: 4px; vertical-align: 1px; }
+.votes i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+details { margin-top: 6px; }
+summary { cursor: pointer; color: var(--neutral-300); font-size: .875rem; }
+pre { white-space: pre-wrap; word-break: break-word; background: var(--neutral-900); border-radius: 8px; padding: 12px; font-size: .8rem; line-height: 1.5; max-height: 360px; overflow: auto; color: var(--neutral-300); }
+.err { color: var(--red); font-size: .875rem; }
+.prompt pre { max-height: 480px; }
+
+footer { margin-top: 100px; position: relative; overflow: hidden; padding: 60px 0 40px; border-top: 1px solid var(--line); }
+footer .blob.v { width: 40%; height: 140%; top: 10%; left: 30%; opacity: .35; }
+footer .wrap { position: relative; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
+footer h2 { font-size: 2rem; }
+footer .small { color: var(--muted); font-size: .875rem; }
+
+.btn[aria-expanded="true"] { border-color: var(--brand-violet); background: rgba(162,1,255,.25); }
+
+/* dropzone */
+.dropzone { position: relative; z-index: 2; margin-top: 8px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.dropzone[hidden] { display: none; }
+.dz-target { border: 2px dashed var(--neutral-600); border-radius: 12px; padding: 28px; background: rgba(0,0,0,.45); cursor: pointer; transition: border-color .15s, background .15s; }
+.dz-target:hover, .dz-target:focus-visible, .dz-target.over { border-color: var(--brand-mint); background: rgba(70,249,184,.08); outline: none; }
+.dz-title { font-size: 1.5rem; font-weight: 500; line-height: 1.3; }
+.dz-sub { color: var(--muted); font-size: .875rem; margin-top: 8px; }
+#dz-list { background: rgba(23,23,23,.7); border: 1px solid var(--line); border-radius: 12px; padding: 16px; font-size: .875rem; max-height: 220px; overflow: auto; }
+.dz-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; }
+.dz-item.cur { background: rgba(162,1,255,.2); }
+.dz-item .n { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+.dz-item .m { color: var(--muted); white-space: nowrap; }
+.dz-item button, .dz-clear { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .875rem; }
+.dz-item button:hover, .dz-clear:hover { color: var(--red); }
+.dz-bad { color: var(--red); padding: 4px 8px; }
+.dz-head { display: flex; justify-content: space-between; color: var(--neutral-300); margin-bottom: 6px; padding: 0 8px; }
+@media (max-width: 767px) { .dropzone { grid-template-columns: 1fr; } }
+
+.empty { padding: 120px 0; text-align: center; color: var(--muted); }
+.drop { outline: 2px dashed var(--brand-mint); outline-offset: -12px; }
+
+@media (max-width: 1023px) {
+  h1 { font-size: 3.2rem; } h2 { font-size: 2.2rem; }
+  .metric { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+  .wrap { padding: 0 16px; }
+  h1 { font-size: 2.6rem; } h2 { font-size: 1.8rem; }
+  section.block { padding-top: 40px; }
+  .db-row, .db-scale { grid-template-columns: 1fr 56px; }
+  .db-row .db-name { grid-column: 1 / -1; }
+  .db-scale div:first-child { display: none; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="blob v"></div><div class="blob p"></div><div class="blob m"></div>
+  <div class="wrap">
+    <nav>
+      <span class="logo">CS<b>/</b>HARK</span>
+      <span class="nav-title">Eval explainer</span>
+      <span class="nav-spacer"></span>
+      <select id="file" aria-label="Result file"></select>
+      <button class="btn" id="dz-toggle" aria-expanded="false" aria-controls="dropzone">Dropzone</button>
+      <label class="btn btn-mint">Open JSON…<input id="upload" type="file" accept=".json,application/json" multiple hidden></label>
+    </nav>
+    <div id="dropzone" class="dropzone" hidden>
+      <div class="dz-target" id="dz-target" tabindex="0" role="button">
+        <div class="dz-title">Drop <span class="serif">eval results</span> here</div>
+        <div class="dz-sub">Any number of <code>claude plugin eval --json</code> files. Each one becomes a source in the dropdown, viewed one at a time. Files stay in this tab.</div>
+      </div>
+      <div id="dz-list"></div>
+    </div>
+    <div id="hero"></div>
+  </div>
+</div>
+<main class="wrap" id="main"></main>
+<footer>
+  <div class="blob v"></div>
+  <div class="wrap">
+    <h2>Trust, <span class="serif">but eval.</span></h2>
+    <div class="small">eval-explainer · www.cshark.com</div>
+  </div>
+</footer>
+
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mean = xs => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+const pct = x => x == null ? '—' : `${Math.round(100 * x)}%`;
+const num = (x, d = 2) => x == null ? '—' : x.toFixed(d);
+const signed = (x, d = 2) => x == null ? '—' : (x >= 0 ? '+' : '') + x.toFixed(d);
+const usd = (x, d = 2) => x == null ? '—' : `$${x.toFixed(d)}`;
+
+let TAGS = {};
+const state = { data: null, name: '', armLabels: {}, sel: null, hmArm: 'with' };
+
+// Same rules as scripts/summarize.py: skill-fired is an indicator, never part of
+// the like-for-like score, even when --ablation none marks it scored.
+const scored = run => (run.graders || []).filter(g => g.scored && g.name !== 'skill-fired');
+function likeForLike(run) {
+  const gs = scored(run);
+  const w = gs.reduce((a, g) => a + g.weight, 0);
+  if (!w) return { score: null, pass: false };
+  return { score: gs.filter(g => g.passed).reduce((a, g) => a + g.weight, 0) / w, pass: gs.every(g => g.passed) };
+}
+
+function analyse(data, fileName) {
+  const arms = ['with', 'without'].filter(a => data.cases.some(c => (c.arms[a] || []).length));
+  const baselineOnly = /-baseline\.json$/.test(fileName);
+  const labels = { with: baselineOnly ? 'baseline' : 'skill', without: 'baseline' };
+  const skillFiredScored = data.cases.some(c => (c.arms.with || []).some(r => r.graders.some(g => g.name === 'skill-fired' && g.scored)));
+
+  const armStats = {};
+  for (const a of arms) {
+    const runs = data.cases.flatMap(c => c.arms[a] || []);
+    const lfl = runs.map(likeForLike);
+    const judge = runs.flatMap(r => scored(r).filter(g => g.name === 'quality').map(g => g.passed));
+    const fired = runs.flatMap(r => r.graders.filter(g => g.name === 'skill-fired').map(g => g.passed));
+    armStats[a] = {
+      n: runs.length,
+      score: mean(lfl.filter(x => x.score != null).map(x => x.score)),
+      fullPass: mean(lfl.map(x => +x.pass)),
+      detPass: mean(runs.map(r => +scored(r).filter(g => g.name !== 'quality').every(g => g.passed))),
+      judgePass: mean(judge.map(Number)),
+      cost: mean(runs.map(r => r.costUsd)),
+      judgeCost: mean(runs.map(r => r.judgeCostUsd || 0)),
+      time: mean(runs.map(r => r.durationSeconds)),
+      turns: mean(runs.map(r => r.turns)),
+      fired: fired.length && labels[a] === 'skill' ? mean(fired.map(Number)) : null,
+      errors: runs.filter(r => r.error).length,
+    };
+  }
+
+  const graderNames = [...new Set(data.cases.flatMap(c => c.graders.map(g => g.name)))]
+    .sort((x, y) => (x === 'quality') - (y === 'quality') || (x === 'skill-fired') - (y === 'skill-fired') || x.localeCompare(y));
+
+  const cases = data.cases.map(c => {
+    const per = {};
+    for (const a of arms) {
+      const runs = c.arms[a] || [];
+      const lfl = runs.map(likeForLike);
+      const graders = {};
+      for (const gn of graderNames) {
+        const vs = runs.flatMap(r => r.graders.filter(g => g.name === gn).map(g => +g.passed));
+        graders[gn] = vs.length ? mean(vs) : null;
+      }
+      per[a] = { runs, score: mean(lfl.filter(x => x.score != null).map(x => x.score)), pass: mean(lfl.map(x => +x.pass)), graders };
+    }
+    const w = per.with?.score, b = per.without?.score;
+    return { name: c.name, raw: c, per, delta: w != null && b != null ? w - b : null, tags: TAGS[c.name] || [] };
+  });
+  cases.sort((x, y) => (y.delta ?? y.per.with?.score ?? 0) - (x.delta ?? x.per.with?.score ?? 0));
+
+  return { arms, labels, armStats, cases, graderNames, skillFiredScored };
+}
+
+function render() {
+  const d = state.data;
+  if (!d) {
+    $('#hero').innerHTML = '';
+    $('#main').innerHTML = `<div class="empty">No result files on the server. Drop <code>claude plugin eval --json</code> files here, or start <code>serve.py --results DIR</code>.</div>`;
+    return;
+  }
+  const A = analyse(d, state.name);
+  state.A = A;
+  const s = d.suite, W = A.armStats.with, B = A.armStats.without;
+  const both = A.arms.includes('without');
+  const plugin = (s.plugins || []).map(p => `${p.name}@${p.version}`).join(', ');
+  const started = d.startedAt ? new Date(d.startedAt).toLocaleString() : '—';
+  const runsPerCase = d.cases[0]?.runsPerCase;
+
+  $('#hero').innerHTML = `
+    <div class="overline">Skill evaluation · ${esc(state.name)}</div>
+    <h1>${both ? 'Does the skill <span class="serif">beat the baseline?</span>' : `One arm, <span class="serif">${esc(A.labels.with)} only.</span>`}</h1>
+    <div class="chips">
+      <span class="chip">model <b>${esc(s.modelOverride || 'default')}</b></span>
+      <span class="chip">judge <b>${esc(s.judgeModel)}</b></span>
+      <span class="chip">ablation <b>${esc(s.ablation)}</b></span>
+      <span class="chip">Claude Code <b>${esc(d.claudeVersion)}</b></span>
+      <span class="chip">plugin <b>${esc(plugin)}</b></span>
+      <span class="chip">started <b>${esc(started)}</b></span>
+      ${d.partial ? '<span class="chip warn">partial result</span>' : ''}
+      ${A.skillFiredScored ? '<span class="chip warn">skill-fired scored — excluded below</span>' : ''}
+    </div>
+    <div class="kpis">
+      ${both ? `<div class="kpi hl"><div class="label">Mean score Δ (skill − baseline)</div><div class="value ${W.score - B.score < 0 ? 'neg' : ''}">${signed(W.score - B.score)}</div><div class="sub">across ${A.cases.length} cases</div></div>` : ''}
+      <div class="kpi"><div class="label">Mean score · ${esc(A.labels.with)}</div><div class="value">${num(W.score)}</div><div class="sub">full pass ${pct(W.fullPass)}</div></div>
+      ${both ? `<div class="kpi"><div class="label">Mean score · baseline</div><div class="value">${num(B.score)}</div><div class="sub">full pass ${pct(B.fullPass)}</div></div>` : ''}
+      <div class="kpi"><div class="label">Runs</div><div class="value">${W.n + (B?.n || 0)}</div><div class="sub">${A.cases.length} cases × ${runsPerCase ?? '?'} × ${A.arms.length} arm${A.arms.length > 1 ? 's' : ''}</div></div>
+      <div class="kpi"><div class="label">Total cost</div><div class="value">${usd(d.costUsd)}</div><div class="sub">incl. LLM judge</div></div>
+      <div class="kpi"><div class="label">Wall clock</div><div class="value">${d.durationSeconds}s</div><div class="sub">concurrency ${s.concurrency}</div></div>
+    </div>`;
+
+  $('#main').innerHTML = `
+    <section class="block">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Arm <span class="serif">comparison</span></h2></div>
+      <p class="sec-lead">Same cases, same prompts. Scores are the weighted grader score with <code>skill-fired</code> left out, so both arms sit on one scale. Cost per run includes the judge.</p>
+      <div class="card">${legend(A)}${armBars(A)}</div>
+    </section>
+    <section class="block">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Per <span class="serif">case</span></h2></div>
+      <p class="sec-lead">Mean score per case on a 0–1 scale, sorted by ${both ? 'the gap between the arms' : 'score'}. Click a case to see every run.</p>
+      <div class="card">${legend(A)}${dumbbell(A)}</div>
+    </section>
+    <section class="block">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Grader <span class="serif">matrix</span></h2></div>
+      <p class="sec-lead">Pass rate of each grader per case. Empty cells: the grader does not apply to that case. Dashed graders are indicators and do not count toward the score.</p>
+      <div class="card" id="hm"></div>
+    </section>
+    <section class="block" id="detail-sec">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Case <span class="serif">detail</span></h2></div>
+      <div id="detail"></div>
+    </section>`;
+
+  renderHeatmap();
+  if (!state.sel || !A.cases.some(c => c.name === state.sel)) state.sel = A.cases[0]?.name;
+  renderDetail();
+  bindRows();
+}
+
+function legend(A) {
+  return `<div class="legend">${A.arms.map(a => `<span><i style="background:${a === 'with' && A.labels.with === 'skill' ? 'var(--skill)' : 'var(--base)'}"></i>${esc(A.labels[a])}</span>`).join('')}</div>`;
+}
+const armColor = (A, a) => a === 'with' && A.labels.with === 'skill' ? 'var(--skill)' : 'var(--base)';
+
+function armBars(A) {
+  const metrics = [
+    ['Mean score', 'weighted graders, 0–1', 'score', 1, v => num(v)],
+    ['Full pass rate', 'every scored grader passed', 'fullPass', 1, pct],
+    ['Deterministic pass rate', 'every regex grader passed', 'detPass', 1, pct],
+    ['Judge PASS', 'LLM judge, majority of votes', 'judgePass', 1, pct],
+    ['Skill fired', 'Skill tool called at least once', 'fired', 1, pct],
+    ['Cost / run', 'agent + judge', 'cost', null, v => usd(v, 4)],
+    ['Time / run', 'seconds', 'time', null, v => `${num(v, 1)}s`],
+    ['Turns / run', '', 'turns', null, v => num(v, 1)],
+  ];
+  return metrics.map(([name, sub, key, max, fmt]) => {
+    const vals = A.arms.map(a => A.armStats[a][key]);
+    if (vals.every(v => v == null)) return '';
+    const m = max ?? (Math.max(...vals.filter(v => v != null)) * 1.1 || 1);
+    return `<div class="metric"><div class="name">${name}<small>${sub}</small></div><div class="bars">${A.arms.map(a => {
+      const v = A.armStats[a][key];
+      return `<div class="bar"><div class="track"><div class="fill" style="width:${v == null ? 0 : 100 * v / m}%;background:${armColor(A, a)}"></div></div><span class="v">${v == null ? 'n/a' : fmt(v)}</span></div>`;
+    }).join('')}</div></div>`;
+  }).join('');
+}
+
+function dumbbell(A) {
+  const rows = A.cases.map(c => {
+    const w = c.per.with?.score, b = c.per.without?.score;
+    const pts = [w, b].filter(v => v != null);
+    const lo = Math.min(...pts), hi = Math.max(...pts);
+    const dCls = c.delta == null ? '' : c.delta < 0 ? 'neg' : 'pos';
+    return `<div class="db-row ${c.name === state.sel ? 'sel' : ''}" data-case="${esc(c.name)}">
+      <div class="db-name">${esc(c.name)}<br>${c.tags.map(t => `<span class="tag ${esc(t)}">${esc(t)}</span>`).join('')}</div>
+      <div class="db-plot"><div class="db-axis"></div>
+        ${pts.length > 1 ? `<div class="db-link" style="left:${lo * 100}%;width:${(hi - lo) * 100}%;background:${c.delta < 0 ? 'var(--red)' : 'var(--mint-700)'}"></div>` : ''}
+        ${b != null ? `<div class="db-dot" title="baseline ${num(b)}" style="left:${b * 100}%;background:var(--base)"></div>` : ''}
+        ${w != null ? `<div class="db-dot" title="${esc(A.labels.with)} ${num(w)}" style="left:${w * 100}%;background:${armColor(A, 'with')}"></div>` : ''}
+      </div>
+      <div class="db-delta ${dCls}">${c.delta != null ? signed(c.delta) : num(w)}</div>
+    </div>`;
+  }).join('');
+  return `${rows}<div class="db-scale"><div></div><div><span>0</span><span>0.5</span><span>1.0</span></div><div style="text-align:right">${A.arms.length > 1 ? 'Δ' : 'score'}</div></div>`;
+}
+
+function renderHeatmap() {
+  const A = state.A;
+  const opts = A.arms.length > 1 ? [['with', A.labels.with], ['without', 'baseline'], ['delta', 'Δ skill − baseline']] : [['with', A.labels.with]];
+  if (!opts.some(o => o[0] === state.hmArm)) state.hmArm = 'with';
+  const unscored = new Set(A.cases.flatMap(c => c.raw.arms.with?.[0]?.graders.filter(g => !g.scored).map(g => g.name) || []));
+  const cell = (c, g) => {
+    let v;
+    if (state.hmArm === 'delta') {
+      const w = c.per.with?.graders[g], b = c.per.without?.graders[g];
+      if (w == null || b == null) return `<td class="na">·</td>`;
+      v = w - b;
+      const a = Math.min(1, Math.abs(v));
+      const bg = v >= 0 ? `rgba(70,249,184,${.12 + .78 * a})` : `rgba(255,103,103,${.12 + .78 * a})`;
+      return `<td style="background:${bg};color:${a > .45 ? '#000' : '#fff'}">${v === 0 ? '0' : signed(v, 1)}</td>`;
+    }
+    v = c.per[state.hmArm]?.graders[g];
+    if (v == null) return `<td class="na">·</td>`;
+    // pass → mint, fail → violet-900 so a fully failing cell still reads as data, not as empty.
+    const bg = v >= .5 ? `rgba(70,249,184,${.2 + .8 * (v - .5) * 2})` : `rgba(162,1,255,${.25 + .5 * (1 - v * 2)})`;
+    return `<td style="background:${bg};color:${v > .75 ? '#000' : '#fff'}" title="${pct(v)}">${pct(v)}</td>`;
+  };
+  $('#hm').innerHTML = `
+    <div class="toggle">${opts.map(([k, l]) => `<button data-hm="${k}" class="${k === state.hmArm ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>
+    <div class="hm-scroll"><table class="hm">
+      <thead><tr><th></th>${A.graderNames.map(g => `<th style="${unscored.has(g) ? 'opacity:.6;font-style:italic' : ''}">${esc(g)}</th>`).join('')}</tr></thead>
+      <tbody>${A.cases.map(c => `<tr data-case="${esc(c.name)}" class="${c.name === state.sel ? 'sel' : ''}"><th>${esc(c.name)}</th>${A.graderNames.map(g => cell(c, g)).join('')}</tr>`).join('')}</tbody>
+    </table></div>`;
+  $('#hm').querySelectorAll('[data-hm]').forEach(b => b.onclick = () => { state.hmArm = b.dataset.hm; renderHeatmap(); bindRows(); });
+}
+
+function renderDetail() {
+  const A = state.A, c = A.cases.find(x => x.name === state.sel);
+  if (!c) { $('#detail').innerHTML = ''; return; }
+  const meta = c.raw;
+  const runCard = (r, i) => {
+    const lfl = likeForLike(r);
+    const graders = r.graders.map(g => {
+      const votes = g.judgeVotes ? `<span class="votes">${g.judgeVotes.map(v => `<i style="background:${v ? 'var(--brand-mint)' : 'var(--red)'}"></i>`).join('')}</span>` : '';
+      return `<span class="g ${g.passed ? 'ok' : 'bad'} ${g.scored ? '' : 'unscored'}" title="${esc(g.explanation)}">${g.passed ? '✓' : '✗'} ${esc(g.name)} ×${g.weight}${votes}</span>`;
+    }).join('');
+    const ev = r.graders.find(g => g.evidence)?.evidence;
+    return `<div class="run">
+      <div class="run-head"><span class="score">${num(lfl.score)}</span>
+        <span class="verdict ${lfl.pass ? 'ok' : 'bad'}">${lfl.pass ? 'PASS' : 'FAIL'}</span>
+        <span>run ${i + 1}</span><span>${usd(r.costUsd, 4)}</span><span>${r.durationSeconds}s</span><span>${r.turns} turns</span></div>
+      <div class="graders">${graders}</div>
+      ${r.error ? `<div class="err">error: ${esc(r.error)}</div>` : ''}
+      ${ev ? `<details><summary>Answer (grader evidence)</summary><pre>${esc(ev)}</pre></details>` : ''}
+    </div>`;
+  };
+  $('#detail').innerHTML = `
+    <p class="sec-lead"><b style="color:var(--text)">${esc(c.name)}</b> ${c.tags.map(t => `<span class="tag ${esc(t)}">${esc(t)}</span>`).join('')}<br>
+      ${A.arms.map(a => `${esc(A.labels[a])} ${num(c.per[a].score)}`).join(' · ')}${c.delta != null ? ` · Δ <span class="${c.delta < 0 ? 'neg' : 'pos'}">${signed(c.delta)}</span>` : ''}
+      · ${meta.runsPerCase} run(s) per arm · max ${meta.maxTurns} turns</p>
+    <div class="runs">${A.arms.map(a => `<div class="arm-col"><h3><i style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${armColor(A, a)};margin-right:8px"></i>${esc(A.labels[a])}</h3>${c.per[a].runs.map(runCard).join('')}</div>`).join('')}</div>
+    <div class="card prompt" style="margin-top:16px"><details><summary>Prompt</summary><pre>${esc(meta.promptMarkdown)}</pre></details></div>`;
+}
+
+function bindRows() {
+  document.querySelectorAll('[data-case]').forEach(el => el.onclick = () => {
+    state.sel = el.dataset.case;
+    document.querySelectorAll('.db-row').forEach(r => r.classList.toggle('sel', r.dataset.case === state.sel));
+    document.querySelectorAll('table.hm tbody tr').forEach(r => r.classList.toggle('sel', r.dataset.case === state.sel));
+    renderDetail();
+    if (el.classList.contains('db-row') || el.tagName === 'TR') $('#detail-sec').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+// Sources: server files (serve.py --results) and dropped files, keyed "server:<name>" / "local:<name>".
+// One source is shown at a time; dropped files live only in this tab.
+const sources = { server: [], local: new Map() };
+let current = '';
+let rejected = [];
+
+const isResult = d => d && Array.isArray(d.cases) && d.suite;
+
+function show(key, data) {
+  current = key;
+  state.data = data; state.name = key.slice(key.indexOf(':') + 1); state.sel = null;
+  $('#file').value = key;
+  if (key.startsWith('server:')) history.replaceState(null, '', `#${encodeURIComponent(state.name)}`);
+  else history.replaceState(null, '', location.pathname);
+  render();
+  renderDropList();
+}
+
+async function select(key) {
+  if (key.startsWith('local:')) return show(key, sources.local.get(key.slice(6)).data);
+  const name = key.slice(7);
+  const r = await fetch(`/api/results/${encodeURIComponent(name)}`);
+  show(key, await r.json());
+}
+
+function renderSelect() {
+  const opt = (k, n) => `<option value="${esc(k)}">${esc(n)}</option>`;
+  const groups = [];
+  if (sources.server.length) groups.push(`<optgroup label="Server">${sources.server.map(f => opt(`server:${f.name}`, f.name)).join('')}</optgroup>`);
+  if (sources.local.size) groups.push(`<optgroup label="Dropped">${[...sources.local.keys()].map(n => opt(`local:${n}`, n)).join('')}</optgroup>`);
+  const sel = $('#file');
+  sel.innerHTML = groups.join('');
+  sel.style.display = groups.length ? '' : 'none';
+  if (current) sel.value = current;
+}
+
+function renderDropList() {
+  const items = [...sources.local.entries()].map(([n, s]) => `
+    <div class="dz-item ${current === `local:${n}` ? 'cur' : ''}">
+      <span class="n" data-open="${esc(n)}">${esc(n)}</span>
+      <span class="m">${s.data.cases.length} cases · ${esc(s.data.suite.ablation || '')}</span>
+      <button data-rm="${esc(n)}" aria-label="Remove ${esc(n)}">✕</button>
+    </div>`).join('');
+  const bad = rejected.map(r => `<div class="dz-bad">✗ ${esc(r)}</div>`).join('');
+  $('#dz-list').innerHTML = `
+    <div class="dz-head"><span>${sources.local.size} dropped file${sources.local.size === 1 ? '' : 's'}</span>${sources.local.size ? '<button class="dz-clear" id="dz-clear">Clear all</button>' : ''}</div>
+    ${items || '<div class="dz-item"><span class="m">Nothing dropped yet.</span></div>'}${bad}`;
+  $('#dz-list').querySelectorAll('[data-open]').forEach(el => el.onclick = () => select(`local:${el.dataset.open}`));
+  $('#dz-list').querySelectorAll('[data-rm]').forEach(el => el.onclick = () => removeLocal([el.dataset.rm]));
+  const clear = $('#dz-clear');
+  if (clear) clear.onclick = () => removeLocal([...sources.local.keys()]);
+}
+
+function removeLocal(names) {
+  names.forEach(n => sources.local.delete(n));
+  rejected = [];
+  renderSelect();
+  if (names.some(n => current === `local:${n}`)) {
+    const next = sources.local.size ? `local:${[...sources.local.keys()].at(-1)}` : sources.server[0] && `server:${sources.server[0].name}`;
+    if (next) return select(next);
+    current = ''; state.data = null; render();
+  }
+  renderDropList();
+}
+
+function uniqueName(name) {
+  if (!sources.local.has(name)) return name;
+  let i = 2;
+  while (sources.local.has(`${name} (${i})`)) i++;
+  return `${name} (${i})`;
+}
+
+async function openLocal(fileList) {
+  const files = [...fileList].filter(f => f.name.endsWith('.json') || f.type === 'application/json');
+  rejected = [...fileList].filter(f => !files.includes(f)).map(f => `${f.name}: not a .json file`);
+  let first = null;
+  for (const f of files) {
+    try {
+      const data = JSON.parse(await f.text());
+      if (!isResult(data)) throw new Error('not a `claude plugin eval --json` result');
+      const name = uniqueName(f.name);
+      sources.local.set(name, { data });
+      first ??= name;
+    } catch (e) {
+      rejected.push(`${f.name}: ${e.message}`);
+    }
+  }
+  renderSelect();
+  if (first) await select(`local:${first}`);
+  else renderDropList();
+  // Rejections would otherwise go unseen with the panel closed.
+  if (rejected.length) setDropzone(true);
+}
+
+function setDropzone(open) {
+  $('#dropzone').hidden = !open;
+  $('#dz-toggle').setAttribute('aria-expanded', open);
+  try { localStorage.setItem('viz.dropzone', open ? '1' : '0'); } catch {}
+  if (open) renderDropList();
+}
+
+$('#file').onchange = e => select(e.target.value);
+$('#upload').onchange = e => { openLocal(e.target.files); e.target.value = ''; };
+$('#dz-toggle').onclick = () => setDropzone($('#dropzone').hidden);
+$('#dz-target').onclick = () => $('#upload').click();
+$('#dz-target').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#upload').click(); } };
+// The whole page stays a drop target; the panel is just a visible one.
+document.addEventListener('dragover', e => {
+  e.preventDefault();
+  document.body.classList.add('drop');
+  $('#dz-target').classList.toggle('over', !!e.target.closest?.('#dz-target'));
+});
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) { document.body.classList.remove('drop'); $('#dz-target').classList.remove('over'); } });
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  document.body.classList.remove('drop'); $('#dz-target').classList.remove('over');
+  if (e.dataTransfer.files.length) openLocal(e.dataTransfer.files);
+});
+
+(async () => {
+  let saved = null;
+  try { saved = localStorage.getItem('viz.dropzone'); } catch {}
+  try {
+    const [files, tags] = await Promise.all([fetch('/api/results').then(r => r.json()), fetch('/api/tags').then(r => r.json())]);
+    TAGS = tags;
+    sources.server = files;
+    renderSelect();
+    const want = decodeURIComponent(location.hash.slice(1));
+    // Prefer the newest with-without file: it is the one with both arms.
+    const pick = files.find(f => f.name === want) || files.find(f => /-both\.json$/.test(f.name)) || files[0];
+    setDropzone(saved === '1' || !pick);
+    if (pick) await select(`server:${pick.name}`); else render();
+  } catch {
+    // Opened as a plain file (no server): the dropzone is the only way in.
+    renderSelect();
+    setDropzone(true);
+    render();
+  }
+})();
+</script>
+</body>
+</html>

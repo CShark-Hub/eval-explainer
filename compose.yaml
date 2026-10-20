@@ -1,0 +1,13 @@
+# docker compose up --build -d   →  http://127.0.0.1:8077
+# Your own results: RESULTS_DIR=/path/to/results CASES_DIR=/path/to/evals/cases docker compose up -d
+# (CASES_DIR is optional; it only adds case tags. examples/ has no cases, so it is a harmless default.)
+services:
+  explainer:
+    build: .
+    ports:
+      # Host loopback only: the explainer is not reachable from the network.
+      - "127.0.0.1:${PORT:-8077}:8077"
+    volumes:
+      - ${RESULTS_DIR:-./examples}:/data/results:ro
+      - ${CASES_DIR:-./examples}:/data/cases:ro
+    restart: unless-stopped

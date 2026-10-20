@@ -1,0 +1,50 @@
+{
+  "adv-ci-bot-fix": [
+    "adversarial"
+  ],
+  "adv-docs-typo-fix": [
+    "adversarial"
+  ],
+  "build-pnpm-via-npm": [
+    "happy"
+  ],
+  "ci-remove-step": [
+    "happy"
+  ],
+  "docs-sourcemap-default": [
+    "happy"
+  ],
+  "edge-breaking-node-version": [
+    "edge",
+    "breaking"
+  ],
+  "edge-breaking-remove-option": [
+    "edge",
+    "breaking"
+  ],
+  "edge-empty-diff": [
+    "edge"
+  ],
+  "edge-huge-diff": [
+    "edge"
+  ],
+  "edge-mixed-unrelated": [
+    "edge",
+    "mixed"
+  ],
+  "feat-tsconfig-option": [
+    "happy"
+  ],
+  "fix-server-base-segment": [
+    "happy"
+  ],
+  "perf-time-middleware": [
+    "happy"
+  ],
+  "refactor-find-to-some": [
+    "happy"
+  ],
+  "test-lazy-compilation": [
+    "happy"
+  ]
+}
